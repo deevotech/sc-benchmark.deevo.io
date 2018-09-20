@@ -1,1 +1,26 @@
-# supply-chain-network-benchmark
+# benchmark-bftsmart-orderingservice
+- Clone https://github.com/hyperledger/caliper
+- Pre-requisites
+    - NodeJS 8.X
+        - curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+        - nano nodesource_setup.sh
+        - sudo bash nodesource_setup.sh
+        - sudo apt-get install nodejs
+    - node-gyp
+    - Docker
+    - Docker-compose
+- Install blockchain SDKs
+    - Fabric
+        - npm install grpc@1.10.1 fabric-ca-client@1.1.2 fabric-client@1.1.2
+- Copy project to capiler
+    - cp -R caliperconfig/benchmark/simple caliper/benchmark/simple
+    - cp -R caliperconfig/network/fabric/mynetwork caliper/network/fabric/mynetwork
+        - mynetwork folder contains crypto-config of network
+    - cp -R src/fabric caliper/src
+- Run benmark
+    - npm test -- simple -c ./benchmark/simple/config.json -n ./benchmark/simple/myfabric-remote.json
+- Run and on web
+   - config apache2 host point to caliper/src/gui/www
+   - Open http://<hostname>/index.html
+   - Choose fabric and simple, click run, to view benchmark
+

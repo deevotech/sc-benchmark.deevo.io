@@ -118,12 +118,13 @@
     },
     "channel": [
       {
-        "name": "mychannel3",
-        "config": "network/fabric/mynetwork/mychannel3.tx",
-        "organizations": ["org1", "org2", "org3", "org4", "org5"]
+        "name": "mychannel",
+        "config": "network/fabric/mynetwork/mychannel.tx",
+        "organizations": ["org1", "org2", "org3", "org4", "org5"],
+        "deployed": "true"
       }
     ],
-    "chaincodes": [{"id": "simple", "path": "contract/fabric/simple/go", "language":"golang", "version": "v1", "channel": "mychannel3"}],
+    "chaincodes": [{"id": "simple", "path": "contract/fabric/simple/go", "language":"golang", "version": "v1.0", "channel": "mychannel", "deployed": "true"}],
     "endorsement-policy": {
       "identities": [
         {
@@ -155,13 +156,19 @@
             "name": "member",
             "mspId": "org5MSP"
           }
+        },
+        {
+          "role": {
+            "name": "admin",
+            "mspId": "org1MSP"
+          }
         }
       ],
       "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}, {"signed-by": 2}, {"signed-by": 3}, {"signed-by": 4}]}
     },
     "context": {
-      "open": "mychannel3",
-      "query": "mychannel3"
+      "open": "mychannel",
+      "query": "mychannel"
     }
   },
   "info" : {
