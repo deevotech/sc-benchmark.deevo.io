@@ -72,7 +72,7 @@ function installChaincode(org, chaincode) {
     let caroots = Buffer.from(data).toString();
     let tlsInfo = null;
 
-    return e2eUtils.tlsEnroll(org)
+    return testUtil.getMyAdmin(org)
         .then((enrollment) => {
             tlsInfo = enrollment;
             return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
@@ -292,7 +292,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
     targets = [];
     const transientMap = {'test': 'transientValue'};
 
-    return e2eUtils.tlsEnroll(org)
+    return estUtil.getMyAdmin(org)
         .then((enrollment) => {
             tlsInfo = enrollment;
             return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
@@ -526,27 +526,26 @@ function getcontext(channelConfig) {
     const caRootsPath = ORGS.orderer.tls_cacerts;
     let data = fs.readFileSync(commUtils.resolvePath(caRootsPath));
     let caroots = Buffer.from(data).toString();
-    //let tlsInfo = null;
+    let tlsInfo = null;
 
     orgName = ORGS[userOrg].name;
-    return e2eUtils.tlsEnroll(org)
+    return estUtil.getMyAdmin(org)
         .then((enrollment) => {
-            //tlsInfo = enrollment;
+            tlsInfo = enrollment;
             return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
         }).then((store) => {
             client.setStateStore(store);
             return testUtil.getSubmitter(client, true, org);
         }).then((admin) => {
             the_user = admin;
-            let sign = testUtil.getMyAdmin(client, org);
             channel.addOrderer(
                 client.newOrderer(
                     ORGS.orderer.url,
                     {
                         'pem': caroots,
                         'ssl-target-name-override': ORGS.orderer['server-hostname'],
-                        'clientCert': sign.cert,
-                        'clientKey': sign.key,
+                        'clientCert': tlsInfo.certificate,
+                        'clientKey': tlsInfo.key,
                         'grpc-max-send-message-length': 1024 * 1024 * 1024,
                         'grpc.max_send_message_length': 1024 * 1024 * 1024,
                         'grpc.max_receive_message_length': 1024 * 1024 * 1024
@@ -571,8 +570,8 @@ function getcontext(channelConfig) {
                     {
                         pem: Buffer.from(data).toString(),
                         'ssl-target-name-override': peerInfo['server-hostname'],
-                        'clientCert': sign.cert,
-                        'clientKey': sign.key,
+                        'clientCert': tlsInfo.certificate,
+                        'clientKey': tlsInfo.key,
                         'grpc-max-send-message-length': 1024 * 1024 * 1024,
                         'grpc.max_send_message_length': 1024 * 1024 * 1024,
                         'grpc.max_receive_message_length': 1024 * 1024 * 1024
@@ -588,8 +587,8 @@ function getcontext(channelConfig) {
                         {
                             pem: Buffer.from(data).toString(),
                             'ssl-target-name-override': peerInfo['server-hostname'],
-                            'clientCert': sign.cert,
-                            'clientKey': sign.key,
+                            'clientCert': tlsInfo.certificate,
+                            'clientKey': tlsInfo.key,
                             'grpc-max-send-message-length': 1024 * 1024 * 1024,
                             'grpc.max_send_message_length': 1024 * 1024 * 1024,
                             'grpc.max_receive_message_length': 1024 * 1024 * 1024,

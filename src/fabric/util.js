@@ -310,7 +310,7 @@ module.exports.getSubmitter = function(client, peerOrgAdmin, org) {
     }
 };
 
-module.exports.getMyAdmin = function(client, userOrg) {
+module.exports.getMyAdmin = function(userOrg) {
     if(!ORGS.hasOwnProperty(userOrg)) {
         throw new Error('Could not found ' + userOrg + ' in configuration');
     }
@@ -318,5 +318,5 @@ module.exports.getMyAdmin = function(client, userOrg) {
     let keyPEM, certPEM;
     keyPEM = fs.readFileSync(commUtils.resolvePath(org.user.key));
     certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
-    return {key: keyPEM.toString(), cert: certPEM.toString()};
+    return {key: keyPEM.toString(), certificate: certPEM.toString()};
 };
