@@ -6,7 +6,7 @@
         - nano nodesource_setup.sh
         - sudo bash nodesource_setup.sh
         - sudo apt-get install nodejs
-    - node-gyp
+    - node-gypsu
     - Docker
     - Docker-compose
 - Install blockchain SDKs

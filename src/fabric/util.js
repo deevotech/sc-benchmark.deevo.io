@@ -20,7 +20,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 //const os = require('os');
-const util = require('util');
+//const util = require('util');
 
 //const jsrsa = require('jsrsasign');
 //const KEYUTIL = jsrsa.KEYUTIL;
@@ -224,9 +224,9 @@ function getAdmin(client, userOrg) {
         certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
     }
     else {
-        let domain = org.domain ? org.domain : (userOrg + '.deevo.com');
+        //let domain = org.domain ? org.domain : (userOrg + '.deevo.com');
         // crypto-dir is already an absolute path
-        let basePath = path.join(cryptodir, 'peerOrganizations', domain, 'users', util.format('Admin@%s', domain));
+        let basePath = path.join(cryptodir, 'orgs', userOrg, 'admin', 'msp');
 
         let keyPath = path.join(basePath, 'keystore');
         if(!fs.existsSync(keyPath)) {
@@ -308,4 +308,15 @@ module.exports.getSubmitter = function(client, peerOrgAdmin, org) {
     } else {
         return getMember('admin-' + userOrg, 'admin-' + userOrg + 'pw', client, userOrg);
     }
+};
+
+module.exports.getMyAdmin = function(client, userOrg) {
+    if(!ORGS.hasOwnProperty(userOrg)) {
+        throw new Error('Could not found ' + userOrg + ' in configuration');
+    }
+    const org = ORGS[userOrg];
+    let keyPEM, certPEM;
+    keyPEM = fs.readFileSync(commUtils.resolvePath(org.user.key));
+    certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
+    return {key: keyPEM.toString(), cert: certPEM.toString()};
 };
