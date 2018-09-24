@@ -311,12 +311,32 @@ module.exports.getSubmitter = function(client, peerOrgAdmin, org) {
 };
 
 module.exports.getMyAdmin = function(userOrg) {
-    if(!ORGS.hasOwnProperty(userOrg)) {
+    /*if(!ORGS.hasOwnProperty(userOrg)) {
         throw new Error('Could not found ' + userOrg + ' in configuration');
     }
     const org = ORGS[userOrg];
     let keyPEM, certPEM;
     keyPEM = fs.readFileSync(commUtils.resolvePath(org.user.key));
     certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
-    return {key: keyPEM.toString(), certificate: certPEM.toString()};
+    let obj = {key: keyPEM.toString(), certificate: certPEM.toString()};
+    if (keyPEM.toString() !== '' && certPEM.toString() !== '') {
+        return obj;
+    } else {
+        return null;
+    }*/
+    //var keyPath = path.join(__dirname, util.format('../networkconfig/orgs/%s/admin/msp/keystore', userOrg));
+    let keyPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/keystore/key');
+    //let keyPEM = Buffer.from(keyPath).toString();
+    //let keyPEM = fs.readFileSync(keyPath);
+    let keyPEM = fs.readFileSync(keyPath);
+    let certPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/signcerts/cert.pem');
+    let certPEM = fs.readFileSync(certPath);
+    let obj = {key: keyPEM.toString(), certificate: certPEM.toString()};
+    //console.log(obj);
+    if (keyPEM.toString() !== '' && certPEM.toString() !== '') {
+        return obj;
+    } else {
+        return null;
+    }
+
 };

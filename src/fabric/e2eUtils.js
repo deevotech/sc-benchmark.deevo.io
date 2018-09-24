@@ -30,9 +30,10 @@ const util = require('util');
 
 const Client = require('fabric-client');
 const testUtil = require('./util.js');
-const e2eUtils = require('./e2eUtils.js');
+//const e2eUtils = require('./e2eUtils.js');
 
 let ORGS;
+let orgTls = [];
 
 let tx_id = null;
 let the_user = null;
@@ -44,6 +45,10 @@ let the_user = null;
 function init(config_path) {
     Client.addConfigFile(config_path);
     ORGS = Client.getConfigSetting('fabric').network;
+    let orgs = ['org1', 'org2', 'org3', 'org4', 'org5'];
+    for (let key in orgs) {
+        orgTls[orgs[key]] = testUtil.getMyAdmin(orgs[key]);
+    }
 }
 module.exports.init = init;
 
@@ -70,136 +75,110 @@ function installChaincode(org, chaincode) {
     const caRootsPath = ORGS.orderer.tls_cacerts;
     let data = fs.readFileSync(commUtils.resolvePath(caRootsPath));
     let caroots = Buffer.from(data).toString();
-    let tlsInfo = null;
 
-    return testUtil.getMyAdmin(org)
-        .then((enrollment) => {
-            tlsInfo = enrollment;
-            return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
-        }).then((store) => {
-            client.setStateStore(store);
+    return Client.newDefaultKeyValueStore({
+        path: testUtil.storePathForOrg(orgName)
+    }).then((store) => {
+        client.setStateStore(store);
 
-            return testUtil.getSubmitter(client, true, org);
-        }).then((admin) => {
-            the_user = admin;
-            channel.addOrderer(
-                client.newOrderer(
-                    ORGS.orderer.url,
-                    {
-                        'pem': caroots,
-                        'clientCert': tlsInfo.certificate,
-                        'clientKey': tlsInfo.key,
-                        'ssl-target-name-override': ORGS.orderer['server-hostname'],
-                        'grpc-max-send-message-length': 1024 * 1024 * 1024,
-                        'grpc.max_send_message_length': 1024 * 1024 * 1024,
-                        'grpc.max_receive_message_length': 1024 * 1024 * 1024
-                    }
-                )
-            );
-
-            let targets = [];
-            /*
-            for (let key in ORGS[org]) {
-                if (ORGS[org].hasOwnProperty(key)) {
-                    if (key.indexOf('peer') === 0) {
-                        let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
-                        let peer = client.newPeer(
-                            ORGS[org][key].requests,
-                            {
-                                pem: Buffer.from(data).toString(),
-                                'clientCert': tlsInfo.certificate,
-                                'clientKey': tlsInfo.key,
-                                'ssl-target-name-override': ORGS.orderer['server-hostname'],
-                                'grpc-max-send-message-length': 1024 * 1024 * 10,
-                                'grpc.max_send_message_length': 1024 * 1024 * 10,
-                                'grpc.max_receive_message_length': 8 * 1024 * 1024
-                            }
-                        );
-
-                        targets.push(peer);
-                        channel.addPeer(peer);
-                    }
+        // get the peer org's admin required to send install chaincode requests
+        return testUtil.getSubmitter(client, true /* get peer org admin */, org);
+    }).then((admin) => {
+        the_user = admin;
+        channel.addOrderer(
+            client.newOrderer(
+                ORGS.orderer.url,
+                {
+                    'pem': caroots,
+                    'clientCert': orgTls[org].certificate,
+                    'clientKey': orgTls[org].key,
+                    'ssl-target-name-override': ORGS.orderer['server-hostname'],
+                    'grpc-max-send-message-length': 1024 * 1024 * 1024,
+                    'grpc.max_send_message_length': 1024 * 1024 * 1024,
+                    'grpc.max_receive_message_length': 1024 * 1024 * 1024
                 }
-            }*/
+            )
+        );
 
-            for (let key in ORGS[org]) {
-                if (ORGS[org].hasOwnProperty(key)) {
-                    if(key.indexOf('peer') === 0) {
-                        let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
-                        let peer = client.newPeer(
-                            ORGS[org][key].requests,
-                            {
-                                'pem': Buffer.from(data).toString(),
-                                'clientCert': tlsInfo.certificate,
-                                'clientKey': tlsInfo.key,
-                                'ssl-target-name-override': ORGS[org][key]['server-hostname'],
-                                'grpc-max-send-message-length': 1024 * 1024 * 1024,
-                                'grpc.max_send_message_length': 1024 * 1024 * 1024,
-                                'grpc.max_receive_message_length': 1024 * 1024 * 1024
-                            }
-                        );
+        let targets = [];
+        for (let key in ORGS[org]) {
+            if (ORGS[org].hasOwnProperty(key)) {
+                if(key.indexOf('peer') === 0) {
+                    let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
+                    let peer = client.newPeer(
+                        ORGS[org][key].requests,
+                        {
+                            'pem': Buffer.from(data).toString(),
+                            'clientCert': orgTls[org].certificate,
+                            'clientKey': orgTls[org].key,
+                            'ssl-target-name-override': ORGS[org][key]['server-hostname'],
+                            'grpc-max-send-message-length': 1024 * 1024 * 1024,
+                            'grpc.max_send_message_length': 1024 * 1024 * 1024,
+                            'grpc.max_receive_message_length': 1024 * 1024 * 1024
+                        }
+                    );
 
-                        targets.push(peer);
-                        channel.addPeer(peer);
-                    }
+                    targets.push(peer);
+                    channel.addPeer(peer);
                 }
             }
-            let resolvedPath = chaincode.path;
-            let metadataPath = chaincode.metadataPath ? commUtils.resolvePath(chaincode.metadataPath) : chaincode.metadataPath;
-            if (chaincode.language === 'node') {
-                resolvedPath = commUtils.resolvePath(chaincode.path);
-            }
+        }
+        let resolvedPath = chaincode.path;
+        let metadataPath = chaincode.metadataPath ? commUtils.resolvePath(chaincode.metadataPath) : chaincode.metadataPath;
+        if (chaincode.language === 'node') {
+            resolvedPath = commUtils.resolvePath(chaincode.path);
+        }
 
-            // send proposal to endorser
-            let cc_id;
-            if(chaincode.language && chaincode.language === 'node'){
-                cc_id = chaincode.id;
-            }else{
-                cc_id = chaincode.id;
-            }
+        // send proposal to endorser
+        let cc_id;
+        if(chaincode.language && chaincode.language === 'node'){
+            cc_id = chaincode.id;
+        }else{
+            cc_id = chaincode.id;
+        }
 
-            // send proposal to endorser
-            let request = {
-                targets: targets,
-                chaincodePath: resolvedPath,
-                metadataPath: metadataPath,
-                chaincodeId: cc_id,
-                chaincodeType: chaincode.language,
-                chaincodeVersion: chaincode.version
-            };
-            if(chaincode.deployed) {
-                //disconnect(eventhubs);
-                return Promise.resolve();
-            }
-            return client.installChaincode(request);
-        },
-        (err) => {
-            throw new Error('Failed to enroll user \'admin\'. ' + err);
-        }).then((results) => {
-            let all_good = true;
-            const errors = [];
-            if (!chaincode.deployed) {
-                const proposalResponses = results[0];
-                for(let i in proposalResponses) {
-                    let one_good = false;
-                    if (proposalResponses && proposalResponses[i].response && proposalResponses[i].response.status === 200) {
-                        one_good = true;
-                    } else {
-                        logger.error('install proposal was bad');
-                        errors.push(proposalResponses[i]);
-                    }
-                    all_good = all_good && one_good;
+        // send proposal to endorser
+        let request = {
+            targets: targets,
+            chaincodePath: resolvedPath,
+            metadataPath: metadataPath,
+            chaincodeId: cc_id,
+            chaincodeType: chaincode.language,
+            chaincodeVersion: chaincode.version
+        };
+        if(chaincode.deployed) {
+            //disconnect(eventhubs);
+            return Promise.resolve();
+        }
+        return client.installChaincode(request);
+    },
+    (err) => {
+        throw new Error('Failed to enroll user \'admin\'. ' + err);
+    }).then((results) => {
+        let all_good = true;
+        const errors = [];
+        if (!chaincode.deployed) {
+            const proposalResponses = results[0];
+            for(let i in proposalResponses) {
+                let one_good = false;
+                if (proposalResponses && proposalResponses[i].response && proposalResponses[i].response.status === 200) {
+                    one_good = true;
+                } else {
+                    logger.error('install proposal was bad');
+                    errors.push(proposalResponses[i]);
                 }
-            } else {
-                all_good = true;
+                all_good = all_good && one_good;
             }
-            if (!all_good) {
-                throw new Error(util.format('Failed to send install Proposal or receive valid response: %s', errors));
-            }
-        },
-        (err) => {
-            throw new Error('Failed to send install proposal due to error: ' + (err.stack ? err.stack : err));
-        })
+        } else {
+            all_good = true;
+        }
+        if (!all_good) {
+            throw new Error(util.format('Failed to send install Proposal or receive valid response: %s', errors));
+        }
+    },
+    (err) => {
+        throw new Error('Failed to send install proposal due to error: ' + (err.stack ? err.stack : err));
+    })
         .catch((err) => {
             return Promise.reject(err);
         });
@@ -286,190 +265,188 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
     const caRootsPath = ORGS.orderer.tls_cacerts;
     let data = fs.readFileSync(commUtils.resolvePath(caRootsPath));
     let caroots = Buffer.from(data).toString();
-    let tlsInfo = null;
 
 
     targets = [];
     const transientMap = {'test': 'transientValue'};
 
-    return estUtil.getMyAdmin(org)
-        .then((enrollment) => {
-            tlsInfo = enrollment;
-            return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
-        }).then((store) => {
-            client.setStateStore(store);
+    return Client.newDefaultKeyValueStore({
+        path: testUtil.storePathForOrg(orgName)
+    }).then((store) => {
+        client.setStateStore(store);
 
-            return testUtil.getSubmitter(client, true, org);
-        }).then((admin) => {
-            the_user = admin;
-            channel.addOrderer(
-                client.newOrderer(
-                    ORGS.orderer.url,
-                    {
-                        'pem': caroots,
-                        'ssl-target-name-override': ORGS.orderer['server-hostname'],
-                        'clientCert': tlsInfo.certificate,
-                        'clientKey': tlsInfo.key,
-                        'grpc-max-send-message-length': 1024 * 1024 * 1024,
-                        'grpc.max_send_message_length': 1024 * 1024 * 1024,
-                        'grpc.max_receive_message_length': 1024 * 1024 * 1024
-                    }
-                )
-            );
-            let eventPeer = null;
-            if(ORGS.hasOwnProperty(org)) {
-                for (let key in ORGS[org]) {
-                    if(ORGS[org].hasOwnProperty(key) && key.indexOf('peer') === 0) {
-                        let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
-                        let peer = client.newPeer(
-                            ORGS[org][key].requests,
-                            {
-                                'pem': Buffer.from(data).toString(),
-                                'clientCert': tlsInfo.certificate,
-                                'clientKey': tlsInfo.key,
-                                'ssl-target-name-override': ORGS[org][key]['server-hostname'],
-                                'grpc-max-send-message-length': 1024 * 1024 * 1024,
-                                'grpc.max_send_message_length': 1024 * 1024 * 1024,
-                                'grpc.max_receive_message_length': 1024 * 1024 * 1024
-                            });
-                        targets.push(peer);
-                        channel.addPeer(peer);
-                        if(org === userOrg && !eventPeer) {
-                            eventPeer = key;
-                        }
-                    }
-                }
-            }
-
-            // an event listener can only register with a peer in its own org
-            let data = fs.readFileSync(commUtils.resolvePath(ORGS[userOrg][eventPeer].tls_cacerts));
-            let eh = client.newEventHub();
-            eh.setPeerAddr(
-                ORGS[userOrg][eventPeer].events,
+        // get the peer org's admin required to send install chaincode requests
+        return testUtil.getSubmitter(client, true /* get peer org admin */, org);
+    }).then((admin) => {
+        the_user = admin;
+        channel.addOrderer(
+            client.newOrderer(
+                ORGS.orderer.url,
                 {
-                    pem: Buffer.from(data).toString(),
-                    'ssl-target-name-override': ORGS[userOrg][eventPeer]['server-hostname'],
-                    'clientCert': tlsInfo.certificate,
-                    'clientKey': tlsInfo.key,
+                    'pem': caroots,
+                    'ssl-target-name-override': ORGS.orderer['server-hostname'],
+                    'clientCert': orgTls[org].certificate,
+                    'clientKey': orgTls[org].key,
                     'grpc-max-send-message-length': 1024 * 1024 * 1024,
                     'grpc.max_send_message_length': 1024 * 1024 * 1024,
                     'grpc.max_receive_message_length': 1024 * 1024 * 1024
                 }
-            );
-            eh.connect();
-            eventhubs.push(eh);
-
-            // read the config block from the orderer for the channel
-            // and initialize the verify MSPs based on the participating
-            // organizations
-            if(chaincode.deployed) {
-                disconnect(eventhubs);
-                return Promise.resolve();
-            }
-            return channel.initialize();
-        }, (err) => {
-            throw new Error('Failed to enroll user \'admin\'. ' + err);
-
-        }).then(() => {
-            if(chaincode.deployed) {
-                disconnect(eventhubs);
-                return Promise.resolve();
-            }
-            // the v1 chaincode has Init() method that expects a transient map
-            if (upgrade) {
-                let request = buildChaincodeProposal(client, the_user, chaincode, upgrade, transientMap, endorsement_policy);
-                tx_id = request.txId;
-
-                return channel.sendUpgradeProposal(request);
-            } else {
-                let request = buildChaincodeProposal(client, the_user, chaincode, upgrade, transientMap, endorsement_policy);
-                tx_id = request.txId;
-                return channel.sendInstantiateProposal(request);
-            }
-
-        }, (err) => {
-            throw new Error('Failed to initialize the channel'+ (err.stack ? err.stack : err));
-        }).then((results) => {
-            let all_good = true;
-            if (!chaincode.deployed) {
-                const proposalResponses = results[0];
-
-                //const proposal = results[1];
-                for(let i in proposalResponses) {
-                    let one_good = false;
-                    if (proposalResponses[i].response && proposalResponses[i].response.status === 200) {
-                        one_good = true;
+            )
+        );
+        let eventPeer = null;
+        if(ORGS.hasOwnProperty(org)) {
+            for (let key in ORGS[org]) {
+                if(ORGS[org].hasOwnProperty(key) && key.indexOf('peer') === 0) {
+                    //let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
+                    let peer = client.newPeer(
+                        ORGS[org][key].requests,
+                        {
+                            'pem': caroots,
+                            'clientCert': orgTls[org].certificate,
+                            'clientKey': orgTls[org].key,
+                            'ssl-target-name-override': ORGS[org][key]['server-hostname'],
+                            'grpc-max-send-message-length': 1024 * 1024 * 1024,
+                            'grpc.max_send_message_length': 1024 * 1024 * 1024,
+                            'grpc.max_receive_message_length': 1024 * 1024 * 1024
+                        });
+                    targets.push(peer);
+                    channel.addPeer(peer);
+                    if(org === userOrg && !eventPeer) {
+                        eventPeer = key;
                     }
-                    all_good = all_good && one_good;
                 }
             }
+        }
 
-            if (all_good && !chaincode.deployed) {
-                const proposalResponses = results[0];
+        // an event listener can only register with a peer in its own org
+        //let data = fs.readFileSync(commUtils.resolvePath(ORGS[userOrg][eventPeer].tls_cacerts));
+        let eh = client.newEventHub();
+        eh.setPeerAddr(
+            ORGS[userOrg][eventPeer].events,
+            {
+                'pem': caroots,
+                'ssl-target-name-override': ORGS[userOrg][eventPeer]['server-hostname'],
+                'clientCert': orgTls[userOrg].certificate,
+                'clientKey': orgTls[userOrg].key,
+                'grpc-max-send-message-length': 1024 * 1024 * 1024,
+                'grpc.max_send_message_length': 1024 * 1024 * 1024,
+                'grpc.max_receive_message_length': 1024 * 1024 * 1024
+            }
+        );
+        eh.connect();
+        eventhubs.push(eh);
 
-                const proposal = results[1];
-                const request = {
-                    proposalResponses: proposalResponses,
-                    proposal: proposal,
-                };
+        // read the config block from the orderer for the channel
+        // and initialize the verify MSPs based on the participating
+        // organizations
+        if(chaincode.deployed) {
+            disconnect(eventhubs);
+            return Promise.resolve();
+        }
+        return channel.initialize();
+    }, (err) => {
+        throw new Error('Failed to enroll user \'admin\'. ' + err);
+
+    }).then(() => {
+        if(chaincode.deployed) {
+            disconnect(eventhubs);
+            return Promise.resolve();
+        }
+        // the v1 chaincode has Init() method that expects a transient map
+        if (upgrade) {
+            let request = buildChaincodeProposal(client, the_user, chaincode, upgrade, transientMap, endorsement_policy);
+            tx_id = request.txId;
+
+            return channel.sendUpgradeProposal(request);
+        } else {
+            let request = buildChaincodeProposal(client, the_user, chaincode, upgrade, transientMap, endorsement_policy);
+            tx_id = request.txId;
+            return channel.sendInstantiateProposal(request);
+        }
+
+    }, (err) => {
+        throw new Error('Failed to initialize the channel'+ (err.stack ? err.stack : err));
+    }).then((results) => {
+        let all_good = true;
+        if (!chaincode.deployed) {
+            const proposalResponses = results[0];
+
+            //const proposal = results[1];
+            for(let i in proposalResponses) {
+                let one_good = false;
+                if (proposalResponses[i].response && proposalResponses[i].response.status === 200) {
+                    one_good = true;
+                }
+                all_good = all_good && one_good;
+            }
+        }
+
+        if (all_good && !chaincode.deployed) {
+            const proposalResponses = results[0];
+
+            const proposal = results[1];
+            const request = {
+                proposalResponses: proposalResponses,
+                proposal: proposal,
+            };
 
                 // set the transaction listener and set a timeout of 5 mins
                 // if the transaction did not get committed within the timeout period,
                 // fail the test
-                const deployId = tx_id.getTransactionID();
+            const deployId = tx_id.getTransactionID();
 
-                const eventPromises = [];
-                eventhubs.forEach((eh) => {
-                    let txPromise = new Promise((resolve, reject) => {
-                        let handle = setTimeout(reject, 300000);
+            const eventPromises = [];
+            eventhubs.forEach((eh) => {
+                let txPromise = new Promise((resolve, reject) => {
+                    let handle = setTimeout(reject, 300000);
 
-                        eh.registerTxEvent(deployId.toString(), (tx, code) => {
-                            clearTimeout(handle);
-                            eh.unregisterTxEvent(deployId);
+                    eh.registerTxEvent(deployId.toString(), (tx, code) => {
+                        clearTimeout(handle);
+                        eh.unregisterTxEvent(deployId);
 
-                            if (code !== 'VALID') {
-                                commUtils.log('The chaincode ' + type + ' transaction was invalid, code = ' + code);
-                                reject();
-                            } else {
-                                commUtils.log('The chaincode ' + type + ' transaction was valid.');
-                                resolve();
-                            }
-                        });
+                        if (code !== 'VALID') {
+                            commUtils.log('The chaincode ' + type + ' transaction was invalid, code = ' + code);
+                            reject();
+                        } else {
+                            commUtils.log('The chaincode ' + type + ' transaction was valid.');
+                            resolve();
+                        }
                     });
-                    eventPromises.push(txPromise);
+                });
+                eventPromises.push(txPromise);
+            });
+
+            const sendPromise = channel.sendTransaction(request);
+            return Promise.all([sendPromise].concat(eventPromises))
+                .then((results) => {
+                    return results[0]; // just first results are from orderer, the rest are from the peer events
+
+                }).catch((err) => {
+                    throw new Error('Failed to send ' + type + ' transaction and get notifications within the timeout period.');
                 });
 
-                const sendPromise = channel.sendTransaction(request);
-                return Promise.all([sendPromise].concat(eventPromises))
-                    .then((results) => {
-                        return results[0]; // just first results are from orderer, the rest are from the peer events
+        } else if (chaincode.deployed) {
+            let result = {
+                status: 'SUCCESS'
+            };
+            return result;
+        } else {
+            throw new Error('Failed to send ' + type + ' Proposal or receive valid response. Response null or status is not 200. exiting...');
+        }
+    }, (err) => {
+        throw new Error('Failed to send ' + type + ' proposal due to error: ' + (err.stack ? err.stack : err));
 
-                    }).catch((err) => {
-                        throw new Error('Failed to send ' + type + ' transaction and get notifications within the timeout period.');
-                    });
-
-            } else if (chaincode.deployed) {
-                let result = {
-                    status: 'SUCCESS'
-                };
-                return result;
-            } else {
-                throw new Error('Failed to send ' + type + ' Proposal or receive valid response. Response null or status is not 200. exiting...');
-            }
-        }, (err) => {
-            throw new Error('Failed to send ' + type + ' proposal due to error: ' + (err.stack ? err.stack : err));
-
-        }).then((response) => {
-            //TODO should look into the event responses
-            if (!(response instanceof Error) && response.status === 'SUCCESS') {
-                disconnect(eventhubs);
-                return Promise.resolve();
-            } else {
-                throw new Error('Failed to order the ' + type + 'transaction. Error code: ' + response.status);
-            }
-        }, (err) => {
-            throw new Error('Failed to send instantiate due to error: ' + (err.stack ? err.stack : err));
-        })
+    }).then((response) => {
+        //TODO should look into the event responses
+        if (!(response instanceof Error) && response.status === 'SUCCESS') {
+            disconnect(eventhubs);
+            return Promise.resolve();
+        } else {
+            throw new Error('Failed to order the ' + type + 'transaction. Error code: ' + response.status);
+        }
+    }, (err) => {
+        throw new Error('Failed to send instantiate due to error: ' + (err.stack ? err.stack : err));
+    })
         .then(()=>{
             disconnect(eventhubs);
             return Promise.resolve();
@@ -526,17 +503,18 @@ function getcontext(channelConfig) {
     const caRootsPath = ORGS.orderer.tls_cacerts;
     let data = fs.readFileSync(commUtils.resolvePath(caRootsPath));
     let caroots = Buffer.from(data).toString();
-    let tlsInfo = null;
 
     orgName = ORGS[userOrg].name;
-    return estUtil.getMyAdmin(org)
-        .then((enrollment) => {
-            tlsInfo = enrollment;
-            return Client.newDefaultKeyValueStore({path: testUtil.storePathForOrg(orgName)});
-        }).then((store) => {
+    return Client.newDefaultKeyValueStore({
+        path: testUtil.storePathForOrg(orgName)
+    })
+        .then((store) => {
             client.setStateStore(store);
-            return testUtil.getSubmitter(client, true, org);
-        }).then((admin) => {
+
+            // get the peer org's admin required to send install chaincode requests
+            return testUtil.getSubmitter(client, true /* get peer org admin */, org);
+        })
+        .then((admin) => {
             the_user = admin;
             channel.addOrderer(
                 client.newOrderer(
@@ -544,8 +522,8 @@ function getcontext(channelConfig) {
                     {
                         'pem': caroots,
                         'ssl-target-name-override': ORGS.orderer['server-hostname'],
-                        'clientCert': tlsInfo.certificate,
-                        'clientKey': tlsInfo.key,
+                        'clientCert': orgTls[org].certificate,
+                        'clientKey': orgTls[org].key,
                         'grpc-max-send-message-length': 1024 * 1024 * 1024,
                         'grpc.max_send_message_length': 1024 * 1024 * 1024,
                         'grpc.max_receive_message_length': 1024 * 1024 * 1024
@@ -570,8 +548,8 @@ function getcontext(channelConfig) {
                     {
                         pem: Buffer.from(data).toString(),
                         'ssl-target-name-override': peerInfo['server-hostname'],
-                        'clientCert': tlsInfo.certificate,
-                        'clientKey': tlsInfo.key,
+                        'clientCert': orgTls[org].certificate,
+                        'clientKey': orgTls[org].key,
                         'grpc-max-send-message-length': 1024 * 1024 * 1024,
                         'grpc.max_send_message_length': 1024 * 1024 * 1024,
                         'grpc.max_receive_message_length': 1024 * 1024 * 1024
@@ -587,8 +565,8 @@ function getcontext(channelConfig) {
                         {
                             pem: Buffer.from(data).toString(),
                             'ssl-target-name-override': peerInfo['server-hostname'],
-                            'clientCert': tlsInfo.certificate,
-                            'clientKey': tlsInfo.key,
+                            'clientCert': orgTls[org].certificate,
+                            'clientKey': orgTls[org].key,
                             'grpc-max-send-message-length': 1024 * 1024 * 1024,
                             'grpc.max_send_message_length': 1024 * 1024 * 1024,
                             'grpc.max_receive_message_length': 1024 * 1024 * 1024,
@@ -912,7 +890,7 @@ module.exports.readAllFiles = readAllFiles;
 /**
  * Read all file contents in the given directory.
  * @param {string} orgName The path of the directory.
- * @return {object[]} The collection of raw file contents.
+ * @return {object} The collection of raw file contents.
  */
 function tlsEnroll(orgName) {
     return new Promise(function (resolve, reject) {
@@ -939,6 +917,7 @@ function tlsEnroll(orgName) {
             },
             function(err) {
                 return reject(err);
+                //throw new Error('Could not found ' + orgName + ' in configuration');
             }
         );
     });
