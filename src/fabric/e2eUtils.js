@@ -31,6 +31,7 @@ const util = require('util');
 const Client = require('fabric-client');
 const testUtil = require('./util.js');
 //const e2eUtils = require('./e2eUtils.js');
+const orgs = ['org1', 'org2', 'org3', 'org4', 'org5'];
 
 let ORGS;
 let orgTls = [];
@@ -45,7 +46,6 @@ let the_user = null;
 function init(config_path) {
     Client.addConfigFile(config_path);
     ORGS = Client.getConfigSetting('fabric').network;
-    let orgs = ['org1', 'org2', 'org3', 'org4', 'org5'];
     for (let key in orgs) {
         orgTls[orgs[key]] = testUtil.getMyAdmin(orgs[key]);
     }
@@ -80,6 +80,11 @@ function installChaincode(org, chaincode) {
         path: testUtil.storePathForOrg(orgName)
     }).then((store) => {
         client.setStateStore(store);
+        /*if (client)
+        {
+            console.log(client);
+            return Promise.reject();
+        }*/
 
         // get the peer org's admin required to send install chaincode requests
         return testUtil.getSubmitter(client, true /* get peer org admin */, org);
@@ -108,7 +113,7 @@ function installChaincode(org, chaincode) {
                     let peer = client.newPeer(
                         ORGS[org][key].requests,
                         {
-                            'pem': Buffer.from(data).toString(),
+                            pem: Buffer.from(data).toString(),
                             'clientCert': orgTls[org].certificate,
                             'clientKey': orgTls[org].key,
                             'ssl-target-name-override': ORGS[org][key]['server-hostname'],
@@ -297,11 +302,11 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
         if(ORGS.hasOwnProperty(org)) {
             for (let key in ORGS[org]) {
                 if(ORGS[org].hasOwnProperty(key) && key.indexOf('peer') === 0) {
-                    //let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
+                    let data = fs.readFileSync(commUtils.resolvePath(ORGS[org][key].tls_cacerts));
                     let peer = client.newPeer(
                         ORGS[org][key].requests,
                         {
-                            'pem': caroots,
+                            pem: Buffer.from(data).toString(),
                             'clientCert': orgTls[org].certificate,
                             'clientKey': orgTls[org].key,
                             'ssl-target-name-override': ORGS[org][key]['server-hostname'],
@@ -319,12 +324,12 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
         }
 
         // an event listener can only register with a peer in its own org
-        //let data = fs.readFileSync(commUtils.resolvePath(ORGS[userOrg][eventPeer].tls_cacerts));
+        let data = fs.readFileSync(commUtils.resolvePath(ORGS[userOrg][eventPeer].tls_cacerts));
         let eh = client.newEventHub();
         eh.setPeerAddr(
             ORGS[userOrg][eventPeer].events,
             {
-                'pem': caroots,
+                pem: Buffer.from(data).toString(),
                 'ssl-target-name-override': ORGS[userOrg][eventPeer]['server-hostname'],
                 'clientCert': orgTls[userOrg].certificate,
                 'clientKey': orgTls[userOrg].key,
@@ -340,7 +345,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
         // and initialize the verify MSPs based on the participating
         // organizations
         if(chaincode.deployed) {
-            disconnect(eventhubs);
+            //disconnect(eventhubs);
             return Promise.resolve();
         }
         return channel.initialize();
@@ -349,7 +354,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
 
     }).then(() => {
         if(chaincode.deployed) {
-            disconnect(eventhubs);
+            //disconnect(eventhubs);
             return Promise.resolve();
         }
         // the v1 chaincode has Init() method that expects a transient map
@@ -439,7 +444,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
     }).then((response) => {
         //TODO should look into the event responses
         if (!(response instanceof Error) && response.status === 'SUCCESS') {
-            disconnect(eventhubs);
+            //disconnect(eventhubs);
             return Promise.resolve();
         } else {
             throw new Error('Failed to order the ' + type + 'transaction. Error code: ' + response.status);
@@ -662,7 +667,7 @@ async function invokebycontext(context, id, version, args, timeout){
             context.engine.submitCallback(1);
         }
         try {
-            proposalResponseObject = await channel.sendTransactionProposal(proposalRequest, timeout * 1000);
+            proposalResponseObject = await channel.sendTransactionProposal(proposalRequest, timeout * 3000);
             invokeStatus.Set('time_endorse', Date.now());
         } catch (err) {
             invokeStatus.Set('time_endorse', Date.now());

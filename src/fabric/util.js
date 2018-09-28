@@ -20,7 +20,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 //const os = require('os');
-//const util = require('util');
+const util = require('util');
 
 //const jsrsa = require('jsrsasign');
 //const KEYUTIL = jsrsa.KEYUTIL;
@@ -214,7 +214,8 @@ function getMember(username, password, client, userOrg) {
  * @return {User} The admin user identity.
  */
 function getAdmin(client, userOrg) {
-    if(!ORGS.hasOwnProperty(userOrg)) {
+    //try {
+    /*if(!ORGS.hasOwnProperty(userOrg)) {
         throw new Error('Could not found ' + userOrg + ' in configuration');
     }
     const org = ORGS[userOrg];
@@ -222,11 +223,15 @@ function getAdmin(client, userOrg) {
     if(org.user) {
         keyPEM = fs.readFileSync(commUtils.resolvePath(org.user.key));
         certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
+        if (keyPEM !== '') {
+            console.log(keyPEM);
+            //return Promise.reject();
+        }
     }
     else {
-        //let domain = org.domain ? org.domain : (userOrg + '.deevo.com');
+        let domain = org.domain ? org.domain : (userOrg + '.deevo.com');
         // crypto-dir is already an absolute path
-        let basePath = path.join(cryptodir, 'orgs', userOrg, 'admin', 'msp');
+        let basePath = path.join(cryptodir, 'peerOrganizations', domain, 'users', util.format('Admin@%s', domain));
 
         let keyPath = path.join(basePath, 'keystore');
         if(!fs.existsSync(keyPath)) {
@@ -246,8 +251,29 @@ function getAdmin(client, userOrg) {
     client.setCryptoSuite(cryptoSuite);
 
     return Promise.resolve(client.createUser({
-        username: 'admin-' + ORGS[userOrg].name,
+        username: 'admin-' + userOrg,
         mspid: org.mspid,
+        cryptoContent: {
+            privateKeyPEM: keyPEM.toString(),
+            signedCertPEM: certPEM.toString()
+        }
+    }));*/
+    //var keyPath = path.join(__dirname, util.format('../networkconfig/orgs/%s/admin/msp/keystore', userOrg));
+    let keyPath = path.join(cryptodir, util.format('orgs/%s/admin/msp/keystore', userOrg));
+    let keyPEM = Buffer.from(readAllFiles(keyPath)[0]).toString();
+
+    //var certPath = path.join(__dirname, util.format('../networkconfig/orgs/%s/admin/msp/signcerts', userOrg));
+    let certPath = path.join(cryptodir, util.format('orgs/%s/admin/msp/signcerts', userOrg));
+    let certPEM = readAllFiles(certPath)[0];
+
+    let cryptoSuite = Client.newCryptoSuite();
+    if (userOrg) {
+        cryptoSuite.setCryptoKeyStore(Client.newCryptoKeyStore({path: module.exports.storePathForOrg(userOrg)}));
+        client.setCryptoSuite(cryptoSuite);
+    }
+    return Promise.resolve(client.createUser({
+        username: 'admin-'+ userOrg,
+        mspid: ORGS[userOrg].mspid,
         cryptoContent: {
             privateKeyPEM: keyPEM.toString(),
             signedCertPEM: certPEM.toString()
@@ -261,9 +287,9 @@ function getAdmin(client, userOrg) {
  * @return {User} The retrieved orderer admin identity.
  */
 function getOrdererAdmin(client) {
-    let keyPath = path.join(cryptodir, '/orgs/org0/admin/msp/keystore');
+    let keyPath = path.join(cryptodir, 'orgs/org0/admin/msp/keystore');
     let keyPEM = Buffer.from(readAllFiles(keyPath)[0]).toString();
-    let certPath = path.join(cryptodir, '/orgs/org0/admin/msp/signcerts');
+    let certPath = path.join(cryptodir, 'orgs/org0/admin/msp/signcerts');
     let certPEM = readAllFiles(certPath)[0];
 
     return Promise.resolve(client.createUser({
@@ -326,9 +352,9 @@ module.exports.getMyAdmin = function(userOrg) {
     }*/
     //var keyPath = path.join(__dirname, util.format('../networkconfig/orgs/%s/admin/msp/keystore', userOrg));
     let keyPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/keystore/key');
-    //let keyPEM = Buffer.from(keyPath).toString();
-    //let keyPEM = fs.readFileSync(keyPath);
     let keyPEM = fs.readFileSync(keyPath);
+    //let keyPEM = fs.readFileSync(keyPath);
+    //console.log(keyPEM);
     let certPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/signcerts/cert.pem');
     let certPEM = fs.readFileSync(certPath);
     let obj = {key: keyPEM.toString(), certificate: certPEM.toString()};

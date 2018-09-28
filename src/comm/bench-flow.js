@@ -303,6 +303,8 @@ module.exports.run = function(configFile, networkFile) {
         startPromise.then(() => {
             return blockchain.init();
         }).then( () => {
+            return blockchain.installSmartContract();
+        }).then( () => {
             return client.init().then((number)=>{
                 return blockchain.prepareClients(number);
             });

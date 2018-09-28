@@ -109,6 +109,8 @@ class Fabric extends BlockchainInterface{
      * @return {Promise<object>} The promise for the result of the execution.
      */
     invokeSmartContract(context, contractID, contractVer, args, timeout) {
+        util.init(this.configPath);
+        e2eUtils.init(this.configPath);
         let promises = [];
         args.forEach((item, index)=>{
             try {

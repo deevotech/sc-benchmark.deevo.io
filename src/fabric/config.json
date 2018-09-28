@@ -3,7 +3,7 @@
         "orderer": {
             "url": "grpcs://orderer0.org0.deevo.com:7050",
             "server-hostname": "orderer0.org0.deevo.com",
-            "tls_cacerts": "network/fabric/mynetwork/orderer/msp/tlscacerts/rca-org0-deevo-com-7054.pem",
+            "tls_cacerts": "network/fabric/mynetwork/org0-ca-cert.pem",
             "name": "org0",
             "mspid": "org0MSP",
             "ca": {
@@ -22,7 +22,7 @@
                 "requests": "grpcs://peer0.org1.deevo.com:7051",
                 "events": "grpcs://peer0.org1.deevo.com:7053",
                 "server-hostname": "peer0.org1.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/peer0.org1.deevo.com/msp/tlscacerts/rca-org1-deevo-com-7054.pem"
+                "tls_cacerts": "network/fabric/mynetwork/org1-ca-cert.pem"
             }
         },
         "org2": {
@@ -36,7 +36,7 @@
                 "requests": "grpcs://peer0.org2.deevo.com:7051",
                 "events": "grpcs://peer0.org2.deevo.com:7053",
                 "server-hostname": "peer0.org2.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/peer0.org2.deevo.com/msp/tlscacerts/rca-org2-deevo-com-7054.pem"
+                "tls_cacerts": "network/fabric/mynetwork/org2-ca-cert.pem"
             }
         },
         "org3": {
@@ -50,7 +50,7 @@
                 "requests": "grpcs://peer0.org3.deevo.com:7051",
                 "events": "grpcs://peer0.org3.deevo.com:7053",
                 "server-hostname": "peer0.org3.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/peer0.org3.deevo.com/msp/tlscacerts/rca-org3-deevo-com-7054.pem"
+                "tls_cacerts": "network/fabric/mynetwork/org3-ca-cert.pem"
             }
         },
         "org4": {
@@ -64,7 +64,7 @@
                 "requests": "grpcs://peer0.org4.deevo.com:7051",
                 "events": "grpcs://peer0.org4.deevo.com:7053",
                 "server-hostname": "peer0.org4.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/peer0.org4.deevo.com/msp/tlscacerts/rca-org4-deevo-com-7054.pem"
+                "tls_cacerts": "network/fabric/mynetwork/org4-ca-cert.pem"
             }
         },
         "org5": {
@@ -78,7 +78,7 @@
                 "requests": "grpcs://peer0.org5.deevo.com:7051",
                 "events": "grpcs://peer0.org5.deevo.com:7053",
                 "server-hostname": "peer0.org5.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/peer0.org5.deevo.com/msp/tlscacerts/rca-org5-deevo-com-7054.pem"
+                "tls_cacerts": "network/fabric/mynetwork/org5-ca-cert.pem"
             }
         }
     }
