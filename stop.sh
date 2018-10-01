@@ -19,7 +19,7 @@ for i in 1 2 3 4 5
 do
     eval ip=\$a$i
     echo ${ip}
-   ssh -p 22 -i ${KEY_PATH}  ubuntu@${ip} 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./stoplogstash -n peer; ./stoplogstash -n java; ./stoplogshash -n beam.smp; exit; '
+   ssh -p 22 -i ${KEY_PATH}  ubuntu@${ip} 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./stoplogstash -n peer; ./stoplogstash -n java; ./stoplogstash -n beam.smp; exit; '
 done
 ssh -p 22 -i ${KEY_PATH}  ubuntu@18.136.126.89 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./stoplogstash -n orderer; ./stoplogstash -n java; exit; '
 
