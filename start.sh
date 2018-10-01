@@ -24,3 +24,12 @@ done
 ssh -p 22 -i ${KEY_PATH}  ubuntu@18.136.126.89 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./logstash -n orderer; ./logstash -n java; exit; '
 sleep 5 
 npm test -- simple -c ./benchmark/simple/config.json -n ./benchmark/simple/myfabric-remote.json
+sleep 5
+for i in 1 2 3 4 5
+do
+    eval ip=\$a$i
+    echo ${ip}
+   ssh -p 22 -i ${KEY_PATH}  ubuntu@${ip} 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./stoplogstash -n peer; ./stoplogstash -n java; exit; '
+done
+ssh -p 22 -i ${KEY_PATH}  ubuntu@18.136.126.89 'cd /opt/gopath/src/github.com/deevotech/supply-chain-network/scripts ; ./stoplogstash -n orderer; ./stoplogstash -n java; exit; '
+
