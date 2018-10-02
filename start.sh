@@ -7,6 +7,8 @@ KEY_PATH=/home/datlv/Documents/deevo/key/dev-full-rights.pem;
 cd /opt/gopath/src/github.com/hyperledger/caliper/
 rm -rf /tmp/hfc/*
 rm -rf .nyc_output/*
+rm -f ./src/gui/demo.json
+rm -r ./src/gui/www/report.html
 # run log cpu and memory from peer, ordering service node, orderer
 n=1 ; eval a$n="13.229.67.40"
 n=2 ; eval a$n="13.250.109.169"
