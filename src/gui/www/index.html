@@ -1,47 +1,59 @@
 <!doctype html>
 <html>
+
 <head>
     <title>Agricultural Food Supply Chain By Blockchain - Network Benchmark</title>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <link rel="icon" href="deevo-icon.png" type="image/gif">
     <style type="text/css">
-        a:link, a:visited {
+        a:link,
+        a:visited {
             text-decoration: none;
             color: #2980b9;
             border-bottom: 1px solid #2980b9;
         }
-        a:hover{
+
+        a:hover {
             text-decoration: none;
             color: #ff0000;
             border-bottom: 1px solid #ff0000;
         }
+
         .left-column {
             position: fixed;
-            width:20%;
+            width: 20%;
             border-radius: 5px;
             background-color: #f2f2f2;
         }
+
         .right-column {
             margin-left: 22%;
-            width:60%;
+            width: 60%;
         }
-        .left-column ul,h2 {
+
+        .left-column ul,
+        h2 {
             display: block;
             margin: 10px;
             padding: 0;
             list-style: none;
         }
-        .left-column ul{
+
+        .left-column ul {
             border-top: 1px solid #d9d9d9;
-            font-size:14px;
+            font-size: 14px;
         }
-        .left-column li,select{
+
+        .left-column li,
+        select {
             margin-bottom: 5px;
             color: #5e6b73;
         }
+
         .left-column h3 {
             border-left: 5px solid #009a61;
         }
+
         .left-column h3>button {
             border: 0;
             width: 60px;
@@ -51,51 +63,65 @@
             color: #fff;
             background: #2980b9;
             cursor: pointer;
-            float:right;
+            float: right;
         }
+
         .left-column select {
             width: 60%;
         }
+
         .right-column>div {
             border-top: 1px solid #d9d9d9;
         }
+
         .right-column ul {
             display: block;
             padding: 0;
             list-style: none;
         }
-        .right-column li{
+
+        .right-column li {
             margin-bottom: 10px;
         }
+
         .right-column p {
             display: inline-block;
-            font-family: verdana,arial,sans-serif;
-            font-size:11px;
+            font-family: verdana, arial, sans-serif;
+            font-size: 11px;
         }
+
         .tag {
             display: inline-block;
             padding: 5px 10px;
             background: #2980b9;
-            font-family: verdana,arial,sans-serif;
-            font-size:11px;
+            font-family: verdana, arial, sans-serif;
+            font-size: 11px;
             color: #fff;
             text-align: center;
             border-radius: 5px;
         }
+
         .chart {
-            height:240px;
-            border:1px solid #d9d9d9;
+            height: 240px;
+            border: 1px solid #d9d9d9;
             padding: 0px;
         }
+
         .right-column pre {
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
             background-color: #f2f2f2;
-            overflow:auto;
-            height:300px;
+            overflow: auto;
+            height: 300px;
             white-space: pre-line;
             font-size: 12px;
+        }
+
+        .footer {
+            display: block;
+            width: 100%;
+            clear: both;
         }
     </style>
 </head>
@@ -113,16 +139,16 @@
     };
     var running = false;
     var bench = "simple";
-    var pageHtmlJson  = null;
+    var pageHtmlJson = null;
     var charts = {
-        throughput : {
+        throughput: {
             obj: null,
             element: 'chartThroughput',
             data: ['submitted', 'succeeded', 'failed'],
             xAxis: 'time',
             yAxis: 'tps',
         },
-        latency : {
+        latency: {
             obj: null,
             element: 'chartLatency',
             data: ['max', 'min', 'avg'],
@@ -136,12 +162,12 @@
     function selectSUT(value) {
         var eleType = "fabric";
         var eleSize = "5 peeers, 1 Orderer(bftsmart)";
-        if(value === "fabric") {
+        if (value === "fabric") {
             sut = "fabric";
             eleType.innerHTML = "Fabric v1.1.1";
             eleSize.innerHTML = "5 peeers, 1 Orderer(bftsmart)";
         }
-        if(value === "stl") {
+        if (value === "stl") {
             sut = "sawtooth";
             eleType.innerHTML = "Sawtooth v0.8.0";
             eleSize.innerHTML = "4 Validators";
@@ -151,11 +177,11 @@
     function selectBenchmark(value) {
         var eleName = document.getElementById("benName");
         var eleInfo = document.getElementById("benInfo");
-        if(value === "simple") {
+        if (value === "simple") {
             eleName.innerHTML = "Simple Benchmark";
-            eleInfo.innerHTML = "This is an example benchmark for caliper, to test the backend DLT&#39;s performance with simple account opening &amp; querying transactions";
-        }
-        else {
+            eleInfo.innerHTML =
+                "This is an example benchmark for caliper, to test the backend DLT&#39;s performance with simple account opening &amp; querying transactions";
+        } else {
             eleName.innerHTML = value + " Benchmark";
             eleInfo.innerHTML = "Not provided yet";
         }
@@ -164,7 +190,7 @@
 
     function loadXMLDoc(xmlhttp, url, cfunc) {
         // xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange=cfunc;
+        xmlhttp.onreadystatechange = cfunc;
         xmlhttp.open("GET", url, true);
         xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
         xmlhttp.send();
@@ -176,7 +202,7 @@
     }
 
     function refreshChart(id) {
-        if(charts[id].obj !== null) {
+        if (charts[id].obj !== null) {
             var opt = getOption(id);
             charts[id].obj.setOption(opt);
         }
@@ -184,9 +210,13 @@
 
     function getOption(id) {
         var opt = {
-            tooltip: { trigger: 'axis' },
+            tooltip: {
+                trigger: 'axis'
+            },
             animation: false,
-            legend: { data: charts[id].data},
+            legend: {
+                data: charts[id].data
+            },
             xAxis: {
                 name: charts[id].xAxis,
                 data: pageHtmlJson[id].x
@@ -195,21 +225,21 @@
                 type: 'value',
                 name: charts[id].yAxis
             },
-            series:[]
+            series: []
         }
         var data = charts[id].data;
         //var colors = ['#32cd32', '#da70d6', '#87cefa', '#2980b9'];
         //var colorLen = 4;
-        for(let i = 0; i < data.length ; i++) {
+        for (let i = 0; i < data.length; i++) {
             opt.series.push({
                 name: data[i],
                 type: 'line',
                 stack: '',
                 symbolSize: 1,
-                itemStyle:{
+                itemStyle: {
                     normal: {
                         lineStyle: {
-                            width:2,
+                            width: 2,
                         }
                     }
                 },
@@ -221,12 +251,12 @@
 
     function refreshTxInfo(sub, succ, fail) {
         var txinfo = document.getElementById("txInfo");
-        txinfo.innerHTML = 'Submitted: '+sub+', Succeeded: '+succ+', Failed: '+fail;
+        txinfo.innerHTML = 'Submitted: ' + sub + ', Succeeded: ' + succ + ', Failed: ' + fail;
     }
 
     function initCharts() {
-        if(!chartInited) {
-            for(let key in charts) {
+        if (!chartInited) {
+            for (let key in charts) {
                 initChart(key);
             }
             chartInited = true;
@@ -237,15 +267,14 @@
 
     function changeRunningStatus(value) {
         running = value;
-        var btn  = document.getElementById("runBtn");
-        if(running){
+        var btn = document.getElementById("runBtn");
+        if (running) {
             btn.innerHTML = "Running";
             btn.style.background = "#5e6b73";
             document.getElementById("report").href = "#";
             initCharts();
-            refreshTxInfo(0,0,0);
-        }
-        else {
+            refreshTxInfo(0, 0, 0);
+        } else {
             btn.innerHTML = "Run";
             btn.style.background = "#2980b9";
             chartInited = false;
@@ -257,34 +286,34 @@
             return;
         }
 
-        if(!sutConf.hasOwnProperty(sut)) {
+        if (!sutConf.hasOwnProperty(sut)) {
             alert('unknown sut type:' + sut);
             return;
         }
-        if(bench !== 'simple') {
+        if (bench !== 'simple') {
             alert('sorry, this demo only supports ^simple^ benchmark');
             return;
         }
 
         changeRunningStatus(true);
-        setTimeout( function () {
-            if(es !== null) {
+        setTimeout(function () {
+            if (es !== null) {
                 es.close();
             }
-            es = new EventSource("remotecontrol.php?b="+bench+"&s="+sutConf[sut].config);
-            es.addEventListener('error', function(e) {
+            es = new EventSource("remotecontrol.php?b=" + bench + "&s=" + sutConf[sut].config);
+            es.addEventListener('error', function (e) {
                 changeRunningStatus(false);
                 es.close();
                 es = null;
             });
-            es.addEventListener('message', function(e) {
+            es.addEventListener('message', function (e) {
                 var msg = JSON.parse(e.data);
-                switch(msg.type) {
+                switch (msg.type) {
                     case 'finish':
                         changeRunningStatus(false);
                         es.close();
                         es = null;
-                        if(msg.data !== 'ok') {
+                        if (msg.data !== 'ok') {
                             alert(msg.data);
                         }
                         break;
@@ -300,20 +329,21 @@
                     case 'metrics':
                         console.log(msg);
                         pageHtmlJson = JSON.parse(msg.data);
-                        if(pageHtmlJson !== null && chartInited) {
-                            for(let key in charts) {
+                        if (pageHtmlJson !== null && chartInited) {
+                            for (let key in charts) {
                                 refreshChart(key);
                             }
                         }
-                        if(pageHtmlJson !== null && pageHtmlJson.hasOwnProperty('summary')) {
-                            refreshTxInfo(pageHtmlJson.summary.txSub, pageHtmlJson.summary.txSucc, pageHtmlJson.summary.txFail);
+                        if (pageHtmlJson !== null && pageHtmlJson.hasOwnProperty('summary')) {
+                            refreshTxInfo(pageHtmlJson.summary.txSub, pageHtmlJson.summary.txSucc,
+                                pageHtmlJson.summary.txFail);
                         }
                         break;
                     case 'debug':
                         alert(msg.data);
                         break;
                     default:
-                        alert('unknown message:'+msg.name);
+                        alert('unknown message:' + msg.name);
                         break;
                 }
             });
@@ -321,63 +351,75 @@
     }
 
     function bye() {
-        if(es !== null) {
+        if (es !== null) {
             es.close();
             es = null;
         }
         chartInited = false;
         var xmlhttp = new XMLHttpRequest();
-        loadXMLDoc(xmlhttp, "stop.php", function(){
+        loadXMLDoc(xmlhttp, "stop.php", function () {
             // do nothing
         });
     }
-
 </script>
+
 <body onbeforeunload="bye()">
 
-<main>
-    <div style="height:60px; font-size: 16px; width: 100%; margin-left: 22%;">
-        <img src="/deevo-icon.png"> <span style="font-weight: bolder; font-size: 16pt;">Agricultural Food Supply Chain By Blockchain - Network Benchmark</span>
-    </div>
-    <div class="left-column">
-        <h2>Caliper</h2>
-        <ul>
-            <h3>&nbspSystem Under Test</h3>
-            <li><strong>Version: &nbsp</strong><span ID="suttype">Hyperledger Fabric Bftsmart v1.1.1</span></li>
-            <li><strong>Size: &nbsp</strong><span ID="sutsize">5 Peers, 1 Orderer(bftsmart)</span></li>
-            <li><strong>Distribution: &nbsp</strong><span ID="sutdist">Single Host</span></li>
-        </ul>
-        <ul>
-            <h3>&nbspBenchmark
-                <button  ID='runBtn' onclick="run()">Run</button>
-            </h3>
-            <li><strong>Name: &nbsp</strong><span ID="benName">Supply Chain network Benchmark</span></li>
-            <li><strong>Description: &nbsp</strong><span ID="benInfo">This is an example benchmark for caliper, to test the backend DLT&#39;s performance with simple account opening &amp; querying transactions</span></li>
-            <li><a id="report" href="#">report</a></li>
-            <!--<li><a href="#benchmarkInfo">Details</a></li>-->
-
-        </ul>
-        <span id="siteseal"><script async type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=APwHx6f9aAojOQjI925eo6hl1pi8B4tU6xw22RbONp0JrItxqzk78a5UyNip"></script></span>
-    </div>
-    <div class="right-column">
-        <div>
-            <h3>Performance</h3>
+    <main>
+        <div class="left-column">
             <ul>
-                <li><strong class="tag">Transactions</strong></li>
-                <li><p ID="txInfo">Submitted: 0, Succeeded: 0, Failed: 0</p></li>
-                <li><strong class="tag">Throughput</strong></li>
-                <li><div class="chart" ID="chartThroughput"></div></li>
-                <li><strong class="tag">Latency</strong></li>
-                <li><div class="chart" ID="chartLatency"></div></li>
+                <h3>&nbspSystem Under Test</h3>
+                <li><strong>Version: &nbsp</strong><span ID="suttype">Hyperledger Fabric Bftsmart v1.1.1</span></li>
+                <li><strong>Size: &nbsp</strong><span ID="sutsize">5 Peers, 1 Orderer(bftsmart)</span></li>
+                <li><strong>Distribution: &nbsp</strong><span ID="sutdist">Single Host</span></li>
             </ul>
-        </div>
-        <div>
-            <h3>Log</h3>
-            <pre ID="benchlog">waiting for benchmark to start</pre>
-        </div>
-    </div>
+            <ul>
+                <h3>&nbspBenchmark
+                    <button ID='runBtn' onclick="run()">Run</button>
+                </h3>
+                <li><strong>Name: &nbsp</strong><span ID="benName">Supply Chain network Benchmark</span></li>
+                <li><strong>Description: &nbsp</strong><span ID="benInfo">This is an example benchmark for caliper, to
+                        test the backend DLT&#39;s performance with simple account opening &amp; querying transactions</span></li>
+                <li><a id="report" href="#">report</a></li>
+                <!--<li><a href="#benchmarkInfo">Details</a></li>-->
 
-</main>
+            </ul>
+            <span id="siteseal">
+                <script async type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=APwHx6f9aAojOQjI925eo6hl1pi8B4tU6xw22RbONp0JrItxqzk78a5UyNip"></script>
+            </span>
+        </div>
+        <div class="right-column">
+                <div style="height:60px; font-size: 16px; width: 100%; padding: 10px;">
+                        <img src="/deevo-icon.png" style="width: 60px;"> <span style="font-weight: bolder; font-size: 16pt; line-height:40px; padding-bottom: 20px; padding-left: 20px;">Agricultural
+                            Food Supply Chain By Blockchain - Network Benchmark</span>
+                    </div>
+            <div>
+                <h3>Performance</h3>
+                <ul>
+                    <li><strong class="tag">Transactions</strong></li>
+                    <li>
+                        <p ID="txInfo">Submitted: 0, Succeeded: 0, Failed: 0</p>
+                    </li>
+                    <li><strong class="tag">Throughput</strong></li>
+                    <li>
+                        <div class="chart" ID="chartThroughput"></div>
+                    </li>
+                    <li><strong class="tag">Latency</strong></li>
+                    <li>
+                        <div class="chart" ID="chartLatency"></div>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3>Log</h3>
+                <pre ID="benchlog">waiting for benchmark to start</pre>
+            </div>
+            <div class="footer">
+                <h5 style="text-align: center !important; padding: 10px;">Built with PHP and nodejs using a opensource provided by <a href="https://github.com/hyperledger/caliper" target="_blank" style="color: black; text-decoration: none;">Caliper</a></h5>
+            </div>
+        </div>
+    </main>
 
 </body>
+
 </html>
