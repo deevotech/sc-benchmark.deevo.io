@@ -3,116 +3,116 @@
     "cryptodir": "network/fabric/mynetwork/crypto-config",
     "network": {
       "orderer": {
-        "url": "grpcs://orderer0.org0.deevo.com:7050",
+        "url": "grpcs://orderer1.org0.deevo.io:7050",
         "mspid": "org0MSP",
-        "domain": "org0.deevo.com",
+        "domain": "org0.deevo.io",
         "msp": "network/fabric/mynetwork/crypto-config/orderer/msp",
-        "server-hostname": "orderer0.org0.deevo.com",
-        "tls_cacerts": "network/fabric/mynetwork/orderer/msp/tlscacerts/rca-org0-deevo-com-7054.pem",
+        "server-hostname": "orderer1.org0.deevo.io",
+        "tls_cacerts": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.io/msp/tlscacerts/rca-org0-deevo-io-7054.pem",
          "user": {
-          "key": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.com/users/Admin@org0.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.com/users/Admin@org0.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.io/users/Admin@org0.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.io/users/Admin@org0.deevo.io/msp/signcerts/cert.pem"
         },
         "name": "org0"
       },
       "org1": {
         "name": "org1",
         "mspid": "org1MSP",
-        "domain": "org1.deevo.com",
-        "msp": "network/fabric/mynetwork/crypto-config/org1.deevo.com/msp/",
+        "domain": "org1.deevo.io",
+        "msp": "network/fabric/mynetwork/crypto-config/org1.deevo.io/msp/",
         "user": {
-          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.com/users/Admin@org1.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.com/users/Admin@org1.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.io/users/Admin@org1.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.io/users/Admin@org1.deevo.io/msp/signcerts/cert.pem"
         },
         "ca": {
-          "url": "https://rca.org1.deevo.com:7054",
-          "name": "rca.org1.deevo.com"
+          "url": "https://rca.org1.deevo.io:7054",
+          "name": "rca.org1.deevo.io"
         },
         "peer1": {
-          "requests": "grpcs://peer0.org1.deevo.com:7051",
-          "events": "grpcs://peer0.org1.deevo.com:7053",
-          "server-hostname": "peer0.org1.deevo.com",
-          "tls_cacerts": "network/fabric/mynetwork/peer0.org1.deevo.com/msp/tlscacerts/rca-org1-deevo-com-7054.pem"
+          "requests": "grpcs://peer1.org1.deevo.io:7051",
+          "events": "grpcs://peer1.org1.deevo.io:7053",
+          "server-hostname": "peer1.org1.deevo.io",
+          "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.io/msp/tlscacerts/rca-org1-deevo-io-7054.pem"
         }
       },
       "org2": {
         "name": "org2",
         "mspid": "org2MSP",
-        "domain": "org2.deevo.com",
-        "msp": "network/fabric/mynetwork/crypto-config/org2.deevo.com/msp/",
+        "domain": "org2.deevo.io",
+        "msp": "network/fabric/mynetwork/crypto-config/org2.deevo.io/msp/",
         "user": {
-          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.com/users/Admin@org2.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.com/users/Admin@org2.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.io/users/Admin@org2.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.io/users/Admin@org2.deevo.io/msp/signcerts/cert.pem"
         },
         "ca": {
-          "url": "https://rca.org2.deevo.com:7054",
-          "name": "rca.org2.deevo.com"
+          "url": "https://rca.org2.deevo.io:7054",
+          "name": "rca.org2.deevo.io"
         },
         "peer1": {
-          "requests": "grpcs://peer0.org2.deevo.com:7051",
-          "events": "grpcs://peer0.org2.deevo.com:7053",
-          "server-hostname": "peer0.org2.deevo.com",
-          "tls_cacerts": "network/fabric/mynetwork/peer0.org2.deevo.com/msp/tlscacerts/rca-org2-deevo-com-7054.pem"
+          "requests": "grpcs://peer1.org2.deevo.io:7051",
+          "events": "grpcs://peer1.org2.deevo.io:7053",
+          "server-hostname": "peer1.org2.deevo.io",
+          "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.io/msp/tlscacerts/rca-org2-deevo-io-7054.pem"
         }
     },
     "org3": {
         "name": "org3",
         "mspid": "org3MSP",
-        "domain": "org3.deevo.com",
-        "msp": "network/fabric/mynetwork/crypto-config/org3.deevo.com/msp/",
+        "domain": "org3.deevo.io",
+        "msp": "network/fabric/mynetwork/crypto-config/org3.deevo.io/msp/",
         "user": {
-          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.com/users/Admin@org3.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.com/users/Admin@org3.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.io/users/Admin@org3.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.io/users/Admin@org3.deevo.io/msp/signcerts/cert.pem"
         },
         "ca": {
-          "url": "https://rca.org3.deevo.com:7054",
-          "name": "rca.org3.deevo.com"
+          "url": "https://rca.org3.deevo.io:7054",
+          "name": "rca.org3.deevo.io"
         },
         "peer1": {
-          "requests": "grpcs://peer0.org3.deevo.com:7051",
-          "events": "grpcs://peer0.org3.deevo.com:7053",
-          "server-hostname": "peer0.org3.deevo.com",
-          "tls_cacerts": "network/fabric/mynetwork/peer0.org3.deevo.com/msp/tlscacerts/rca-org3-deevo-com-7054.pem"
+          "requests": "grpcs://peer1.org3.deevo.io:7051",
+          "events": "grpcs://peer1.org3.deevo.io:7053",
+          "server-hostname": "peer1.org3.deevo.io",
+          "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.io/msp/tlscacerts/rca-org3-deevo-io-7054.pem"
         }
     },
     "org4": {
         "name": "org4",
         "mspid": "org4MSP",
-        "domain": "org4.deevo.com",
-        "msp": "network/fabric/mynetwork/crypto-config/org4.deevo.com/msp/",
+        "domain": "org4.deevo.io",
+        "msp": "network/fabric/mynetwork/crypto-config/org4.deevo.io/msp/",
         "user": {
-          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.com/users/Admin@org4.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.com/users/Admin@org4.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.io/users/Admin@org4.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.io/users/Admin@org4.deevo.io/msp/signcerts/cert.pem"
         },
         "ca": {
-          "url": "https://rca.org4.deevo.com:7054",
-          "name": "rca.org4.deevo.com"
+          "url": "https://rca.org4.deevo.io:7054",
+          "name": "rca.org4.deevo.io"
         },
         "peer1": {
-          "requests": "grpcs://peer0.org4.deevo.com:7051",
-          "events": "grpcs://peer0.org4.deevo.com:7053",
-          "server-hostname": "peer0.org4.deevo.com",
-          "tls_cacerts": "network/fabric/mynetwork/peer0.org4.deevo.com/msp/tlscacerts/rca-org4-deevo-com-7054.pem"
+          "requests": "grpcs://peer1.org4.deevo.io:7051",
+          "events": "grpcs://peer1.org4.deevo.io:7053",
+          "server-hostname": "peer1.org4.deevo.io",
+          "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.io/msp/tlscacerts/rca-org4-deevo-io-7054.pem"
         }
     },
     "org5": {
         "name": "org5",
         "mspid": "org5MSP",
-        "domain": "org5.deevo.com",
-        "msp": "network/fabric/mynetwork/crypto-config/org5.deevo.com/msp/",
+        "domain": "org5.deevo.io",
+        "msp": "network/fabric/mynetwork/crypto-config/org5.deevo.io/msp/",
         "user": {
-          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.com/users/Admin@org5.deevo.com/msp/keystore/key.pem",
-          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.com/users/Admin@org5.deevo.com/msp/signcerts/cert.pem"
+          "key": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.io/users/Admin@org5.deevo.io/msp/keystore/key.pem",
+          "cert": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.io/users/Admin@org5.deevo.io/msp/signcerts/cert.pem"
         },
         "ca": {
-          "url": "https://rca.org5.deevo.com:7054",
-          "name": "rca.org5.deevo.com"
+          "url": "https://rca.org5.deevo.io:7054",
+          "name": "rca.org5.deevo.io"
         },
         "peer1": {
-          "requests": "grpcs://peer0.org5.deevo.com:7051",
-          "events": "grpcs://peer0.org5.deevo.com:7053",
-          "server-hostname": "peer0.org5.deevo.com",
-          "tls_cacerts": "network/fabric/mynetwork/peer0.org5.deevo.com/msp/tlscacerts/rca-org5-deevo-com-7054.pem"
+          "requests": "grpcs://peer1.org5.deevo.io:7051",
+          "events": "grpcs://peer1.org5.deevo.io:7053",
+          "server-hostname": "peer1.org5.deevo.io",
+          "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.io/msp/tlscacerts/rca-org5-deevo-io-7054.pem"
         }
       }
     },
@@ -124,7 +124,7 @@
         "deployed": "true"
       }
     ],
-    "chaincodes": [{"id": "simple", "path": "contract/fabric/simple/go", "language":"golang", "version": "v1.2", "channel": "mychannel", "deployed": "true"}],
+    "chaincodes": [{"id": "simple1", "path": "contract/fabric/simple/go", "language":"golang", "version": "v1.2", "channel": "mychannel", "deployed": "true"}],
     "endorsement-policy": {
       "identities": [
         {

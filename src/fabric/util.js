@@ -351,11 +351,11 @@ module.exports.getMyAdmin = function(userOrg) {
         return null;
     }*/
     //var keyPath = path.join(__dirname, util.format('../networkconfig/orgs/%s/admin/msp/keystore', userOrg));
-    let keyPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/keystore/key');
+    let keyPath = path.join(cryptodir, 'peerOrganizations/' + userOrg + '.deevo.io/users/Admin@' + userOrg +'.deevo.io/tls/server.key');
     let keyPEM = fs.readFileSync(keyPath);
     //let keyPEM = fs.readFileSync(keyPath);
     //console.log(keyPEM);
-    let certPath = path.join(cryptodir, 'tls-peer0.' + userOrg + '.deevo.com/signcerts/cert.pem');
+    let certPath = path.join(cryptodir, 'peerOrganizations/' + userOrg + '.deevo.io/users/Admin@' + userOrg +'.deevo.io/tls/server.crt');
     let certPEM = fs.readFileSync(certPath);
     let obj = {key: keyPEM.toString(), certificate: certPEM.toString()};
     //console.log(obj);

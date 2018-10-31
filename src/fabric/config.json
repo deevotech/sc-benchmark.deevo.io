@@ -1,84 +1,84 @@
 {
     "network": {
         "orderer": {
-            "url": "grpcs://orderer0.org0.deevo.com:7050",
-            "server-hostname": "orderer0.org0.deevo.com",
-            "tls_cacerts": "network/fabric/mynetwork/org0-ca-cert.pem",
+            "url": "grpcs://orderer1.org0.deevo.io:7050",
+            "server-hostname": "orderer1.org0.deevo.io",
+            "tls_cacerts": "network/fabric/mynetwork/crypto-config/ordererOrganizations/org0.deevo.io/msp/tlscacerts/rca-org0-deevo-io-7054.pem",
             "name": "org0",
             "mspid": "org0MSP",
             "ca": {
-                "url": "https://rca.org0.deevo.com:7054",
-                "name": "rca.org0.deevo.com"
+                "url": "https://rca.org0.deevo.io:7054",
+                "name": "rca.org0.deevo.io"
             }
         },
         "org1": {
             "name": "org1",
             "mspid": "org1MSP",
             "ca": {
-                "url": "https://rca.org1.deevo.com:7054",
-                "name": "rca.org1.deevo.com"
+                "url": "https://rca.org1.deevo.io:7054",
+                "name": "rca.org1.deevo.io"
             },
             "peer1": {
-                "requests": "grpcs://peer0.org1.deevo.com:7051",
-                "events": "grpcs://peer0.org1.deevo.com:7053",
-                "server-hostname": "peer0.org1.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/org1-ca-cert.pem"
+                "requests": "grpcs://peer1.org1.deevo.io:7051",
+                "events": "grpcs://peer1.org1.deevo.io:7053",
+                "server-hostname": "peer1.org1.deevo.io",
+                "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org1.deevo.io/msp/tlscacerts/rca-org1-deevo-io-7054.pem"
             }
         },
         "org2": {
             "name": "org2",
             "mspid": "org2MSP",
             "ca": {
-                "url": "https://rca.org2.deevo.com:7054",
-                "name": "rca.org2.deevo.com"
+                "url": "https://rca.org2.deevo.io:7054",
+                "name": "rca.org2.deevo.io"
             },
             "peer1": {
-                "requests": "grpcs://peer0.org2.deevo.com:7051",
-                "events": "grpcs://peer0.org2.deevo.com:7053",
-                "server-hostname": "peer0.org2.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/org2-ca-cert.pem"
+                "requests": "grpcs://peer1.org2.deevo.io:7051",
+                "events": "grpcs://peer1.org2.deevo.io:7053",
+                "server-hostname": "peer1.org2.deevo.io",
+                "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org2.deevo.io/msp/tlscacerts/rca-org2-deevo-io-7054.pem"
             }
         },
         "org3": {
             "name": "org3",
             "mspid": "org3MSP",
             "ca": {
-                "url": "https://rca.org3.deevo.com:7054",
-                "name": "rca.org3.deevo.com"
+                "url": "https://rca.org3.deevo.io:7054",
+                "name": "rca.org3.deevo.io"
             },
             "peer1": {
-                "requests": "grpcs://peer0.org3.deevo.com:7051",
-                "events": "grpcs://peer0.org3.deevo.com:7053",
-                "server-hostname": "peer0.org3.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/org3-ca-cert.pem"
+                "requests": "grpcs://peer1.org3.deevo.io:7051",
+                "events": "grpcs://peer1.org3.deevo.io:7053",
+                "server-hostname": "peer1.org3.deevo.io",
+                "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org3.deevo.io/msp/tlscacerts/rca-org3-deevo-io-7054.pem"
             }
         },
         "org4": {
             "name": "org4",
             "mspid": "org4MSP",
             "ca": {
-                "url": "https://rca.org4.deevo.com:7054",
-                "name": "rca.org4.deevo.com"
+                "url": "https://rca.org4.deevo.io:7054",
+                "name": "rca.org4.deevo.io"
             },
             "peer1": {
-                "requests": "grpcs://peer0.org4.deevo.com:7051",
-                "events": "grpcs://peer0.org4.deevo.com:7053",
-                "server-hostname": "peer0.org4.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/org4-ca-cert.pem"
+                "requests": "grpcs://peer1.org4.deevo.io:7051",
+                "events": "grpcs://peer1.org4.deevo.io:7053",
+                "server-hostname": "peer1.org4.deevo.io",
+                "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org4.deevo.io/msp/tlscacerts/rca-org4-deevo-io-7054.pem"
             }
         },
         "org5": {
             "name": "org5",
             "mspid": "org5MSP",
             "ca": {
-                "url": "https://rca.org5.deevo.com:7054",
-                "name": "rca.org5.deevo.com"
+                "url": "https://rca.org5.deevo.io:7054",
+                "name": "rca.org5.deevo.io"
             },
             "peer1": {
-                "requests": "grpcs://peer0.org5.deevo.com:7051",
-                "events": "grpcs://peer0.org5.deevo.com:7053",
-                "server-hostname": "peer0.org5.deevo.com",
-                "tls_cacerts": "network/fabric/mynetwork/org5-ca-cert.pem"
+                "requests": "grpcs://peer1.org5.deevo.io:7051",
+                "events": "grpcs://peer1.org5.deevo.io:7053",
+                "server-hostname": "peer1.org5.deevo.io",
+                "tls_cacerts": "network/fabric/mynetwork/crypto-config/peerOrganizations/org5.deevo.io/msp/tlscacerts/rca-org5-deevo-io-7054.pem"
             }
         }
     }
